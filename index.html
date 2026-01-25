@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>LoopMaster License Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 24px;
+            background: linear-gradient(90deg, #00f5d4, #7b61ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h2 {
+            color: #00f5d4;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00f5d4, #00d4aa);
+            color: #0a0a1a;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover,
+        .btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffa502, #ff7f50);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+            width: auto;
+            margin: 4px;
+        }
+
+        input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            color: white;
+            width: 100%;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .license-key {
+            font-family: monospace;
+            font-size: 16px;
+            background: rgba(0, 245, 212, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 12px 0;
+            text-align: center;
+            color: #00f5d4;
+            border: 1px dashed #00f5d4;
+            word-break: break-all;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00f5d4;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+        }
+
+        .license-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .license-key-text {
+            font-family: monospace;
+            font-size: 13px;
+            color: #00f5d4;
+            word-break: break-all;
+        }
+
+        .license-status {
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .license-email {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .status-available {
+            color: #2ecc71;
+        }
+
+        .status-active {
+            color: #3498db;
+        }
+
+        .status-revoked {
+            color: #e74c3c;
+        }
+
+        .actions {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        .login-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .login-error {
+            color: #ff4757;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00f5d4;
+            color: #0a0a1a;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <div class="login-icon">🔐</div>
+            <h2 style="margin-bottom: 20px;">Admin Login</h2>
+            <input type="password" id="passwordInput" placeholder="Masukkan password" autocomplete="off">
+            <button class="btn" onclick="checkPassword()">Login</button>
+            <div id="loginError" class="login-error hidden">Password salah!</div>
+        </div>
+    </div>
+
+    <!-- Main App (hidden until login) -->
+    <div id="mainApp" class="container hidden">
+        <h1>🔐 LoopMaster License</h1>
+
+        <div class="stats" id="stats">
+            <div class="stat-box">
+                <div class="stat-number" id="totalLicenses">-</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="activeLicenses">-</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="availableLicenses">-</div>
+                <div class="stat-label">Available</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="revokedLicenses">-</div>
+                <div class="stat-label">Revoked</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎫 Generate License</h2>
+            <input type="email" id="customerEmail" placeholder="Email customer (optional)">
+            <button class="btn" onclick="generateLicense()">Generate New License</button>
+            <div id="generatedKey" class="license-key hidden"></div>
+        </div>
+
+        <div class="card">
+            <h2>📋 All Licenses</h2>
+            <div id="licenseList">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; opacity: 0.5; font-size: 12px;">
+            <button onclick="logout()"
+                style="background: none; border: none; color: white; text-decoration: underline; cursor: pointer;">Logout</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Copied!</div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbWWm7pezH9KOUwhFJaeR5VL1RKD6h1cE",
+            authDomain: "loopmaster-license.firebaseapp.com",
+            projectId: "loopmaster-license",
+            storageBucket: "loopmaster-license.firebasestorage.app",
+            messagingSenderId: "962424943920",
+            appId: "1:962424943920:web:503519d66060ac490044f5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Password (hashed for basic security)
+        const ADMIN_PASSWORD = '180201';
+
+        // Check password
+        window.checkPassword = function () {
+            const input = document.getElementById('passwordInput').value;
+            if (input === ADMIN_PASSWORD) {
+                localStorage.setItem('loopmaster_auth', 'true');
+                showApp();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        // Check if already logged in
+        function checkAuth() {
+            if (localStorage.getItem('loopmaster_auth') === 'true') {
+                showApp();
+            }
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            loadLicenses();
+        }
+
+        window.logout = function () {
+            localStorage.removeItem('loopmaster_auth');
+            location.reload();
+        }
+
+        // Generate random license key
+        window.generateLicenseKey = function () {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let key = 'LOOP-';
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 4; j++) {
+                    key += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                if (i < 2) key += '-';
+            }
+            return key;
+        }
+
+        // Generate and save license
+        window.generateLicense = async function () {
+            const email = document.getElementById('customerEmail').value || 'not-specified';
+            const key = generateLicenseKey();
+
+            try {
+                await setDoc(doc(db, 'licenses', key), {
+                    status: 'available',
+                    email: email,
+                    createdAt: new Date().toISOString()
+                });
+
+                const keyDiv = document.getElementById('generatedKey');
+                keyDiv.classList.remove('hidden');
+                keyDiv.innerHTML = `<strong>New Key:</strong><br>${key}<br><button class="btn btn-small" style="margin-top:10px" onclick="copyKey('${key}')">📋 Copy</button>`;
+
+                document.getElementById('customerEmail').value = '';
+                loadLicenses();
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        // Copy to clipboard
+        window.copyKey = function (key) {
+            navigator.clipboard.writeText(key);
+            showToast('Copied: ' + key);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Revoke license
+        window.revokeLicense = async function (key) {
+            if (confirm(`Revoke ${key}?`)) {
+                await updateDoc(doc(db, 'licenses', key), { status: 'revoked' });
+                loadLicenses();
+                showToast('Revoked!');
+            }
+        }
+
+        // Reset license
+        window.resetLicense = async function (key) {
+            if (confirm(`Reset ${key}?`)) {
+                await updateDoc(doc(db, 'licenses', key), {
+                    status: 'available',
+                    machineId: null,
+                    activatedAt: null
+                });
+                loadLicenses();
+                showToast('Reset!');
+            }
+        }
+
+        // Delete license
+        window.deleteLicense = async function (key) {
+            if (confirm(`DELETE ${key}?`)) {
+                await deleteDoc(doc(db, 'licenses', key));
+                loadLicenses();
+                showToast('Deleted!');
+            }
+        }
+
+        // Load all licenses
+        async function loadLicenses() {
+            const querySnapshot = await getDocs(collection(db, 'licenses'));
+
+            let total = 0, active = 0, available = 0, revoked = 0;
+            let html = '';
+
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                total++;
+                if (data.status === 'active') active++;
+                else if (data.status === 'available') available++;
+                else if (data.status === 'revoked') revoked++;
+
+                const statusClass = `status-${data.status}`;
+
+                html += `
+                <div class="license-item">
+                    <div class="license-key-text" onclick="copyKey('${docSnap.id}')">${docSnap.id}</div>
+                    <div class="license-status ${statusClass}">${data.status}</div>
+                    <div class="license-email">${data.email || '-'}</div>
+                    <div class="actions">
+                        ${data.status !== 'revoked' ? `<button class="btn btn-danger btn-small" onclick="revokeLicense('${docSnap.id}')">Revoke</button>` : ''}
+                        ${data.status === 'active' ? `<button class="btn btn-warning btn-small" onclick="resetLicense('${docSnap.id}')">Reset</button>` : ''}
+                        <button class="btn btn-small" onclick="deleteLicense('${docSnap.id}')">🗑️</button>
+                    </div>
+                </div>`;
+            });
+
+            document.getElementById('totalLicenses').textContent = total;
+            document.getElementById('activeLicenses').textContent = active;
+            document.getElementById('availableLicenses').textContent = available;
+            document.getElementById('revokedLicenses').textContent = revoked;
+            document.getElementById('licenseList').innerHTML = html || '<div class="loading">No licenses yet</div>';
+        }
+
+        // Enter key support
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        // Check auth on load
+        checkAuth();
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+
+</html>
