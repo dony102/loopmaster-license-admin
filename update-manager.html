@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>LoopMaster Update Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 24px;
+            background: linear-gradient(90deg, #ffa502, #ff6b81);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h2 {
+            color: #ffa502;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ffa502, #ff7f50);
+            color: #0a0a1a;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            width: 100%;
+            transition: transform 0.2s;
+            margin-top: 12px;
+        }
+
+        .btn:hover {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        input,
+        textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            color: white;
+            width: 100%;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .current-info {
+            background: rgba(255, 165, 2, 0.1);
+            border: 1px dashed #ffa502;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .info-value {
+            color: #ffa502;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #2ecc71;
+        }
+
+        .error {
+            color: #e74c3c;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffa502;
+            color: #0a0a1a;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        .login-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .login-error {
+            color: #ff4757;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        .nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            color: #ffa502;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <div class="login-icon">🔄</div>
+            <h2 style="margin-bottom: 20px;">Update Manager</h2>
+            <input type="password" id="passwordInput" placeholder="Masukkan password" autocomplete="off">
+            <button class="btn" onclick="checkPassword()">Login</button>
+            <div id="loginError" class="login-error hidden">Password salah!</div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="container hidden">
+        <h1>🔄 LoopMaster Update Manager</h1>
+
+        <!-- Current Info -->
+        <div class="card">
+            <h2>📊 Status Saat Ini</h2>
+            <div class="current-info">
+                <div class="info-row">
+                    <span class="info-label">Versi Terbaru</span>
+                    <span class="info-value" id="currentVersion">Loading...</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Download URL</span>
+                    <span class="info-value" id="currentUrl"
+                        style="word-break: break-all; font-size: 12px;">Loading...</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Changelog</span>
+                    <span class="info-value" id="currentChangelog" style="font-size: 12px;">Loading...</span>
+                </div>
+            </div>
+            <button class="btn btn-secondary" onclick="loadCurrentInfo()">🔄 Refresh</button>
+        </div>
+
+        <!-- Update Form -->
+        <div class="card">
+            <h2>✏️ Update Info Aplikasi</h2>
+            <label>Versi Terbaru</label>
+            <input type="text" id="inputVersion" placeholder="Contoh: 2.1.0">
+
+            <label>Download URL</label>
+            <input type="url" id="inputUrl" placeholder="https://drive.google.com/...">
+
+            <label>Changelog (opsional)</label>
+            <textarea id="inputChangelog" placeholder="Contoh: Fitur baru, perbaikan bug, dll"></textarea>
+
+            <button class="btn" onclick="saveUpdateInfo()">💾 Simpan Perubahan</button>
+            <div id="saveStatus" style="text-align: center; margin-top: 12px;"></div>
+        </div>
+
+        <a href="index.html" class="nav-link">← Kembali ke License Manager</a>
+
+        <div style="text-align: center; margin-top: 20px; opacity: 0.5; font-size: 12px;">
+            <button onclick="logout()"
+                style="background: none; border: none; color: white; text-decoration: underline; cursor: pointer;">Logout</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Saved!</div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbWWm7pezH9KOUwhFJaeR5VL1RKD6h1cE",
+            authDomain: "loopmaster-license.firebaseapp.com",
+            projectId: "loopmaster-license",
+            storageBucket: "loopmaster-license.firebasestorage.app",
+            messagingSenderId: "962424943920",
+            appId: "1:962424943920:web:503519d66060ac490044f5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const ADMIN_PASSWORD = '180201';
+
+        window.checkPassword = function () {
+            const input = document.getElementById('passwordInput').value;
+            if (input === ADMIN_PASSWORD) {
+                localStorage.setItem('loopmaster_auth', 'true');
+                showApp();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function checkAuth() {
+            if (localStorage.getItem('loopmaster_auth') === 'true') {
+                showApp();
+            }
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            loadCurrentInfo();
+        }
+
+        window.logout = function () {
+            localStorage.removeItem('loopmaster_auth');
+            location.reload();
+        }
+
+        // Load current update info
+        window.loadCurrentInfo = async function () {
+            try {
+                const docRef = doc(db, 'app_info', 'loopmaster');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('currentVersion').textContent = data.version || '-';
+                    document.getElementById('currentUrl').textContent = data.downloadUrl || '(belum diset)';
+                    document.getElementById('currentChangelog').textContent = data.changelog || '(kosong)';
+
+                    // Pre-fill form
+                    document.getElementById('inputVersion').value = data.version || '';
+                    document.getElementById('inputUrl').value = data.downloadUrl || '';
+                    document.getElementById('inputChangelog').value = data.changelog || '';
+                } else {
+                    document.getElementById('currentVersion').textContent = 'Belum ada data';
+                    document.getElementById('currentUrl').textContent = '-';
+                    document.getElementById('currentChangelog').textContent = '-';
+                }
+            } catch (e) {
+                console.error('Error loading:', e);
+                showToast('Error: ' + e.message);
+            }
+        }
+
+        // Save update info
+        window.saveUpdateInfo = async function () {
+            const version = document.getElementById('inputVersion').value.trim();
+            const downloadUrl = document.getElementById('inputUrl').value.trim();
+            const changelog = document.getElementById('inputChangelog').value.trim();
+            const status = document.getElementById('saveStatus');
+
+            if (!version) {
+                status.innerHTML = '<span class="error">❌ Versi wajib diisi!</span>';
+                return;
+            }
+
+            status.innerHTML = '<span>Menyimpan...</span>';
+
+            try {
+                await setDoc(doc(db, 'app_info', 'loopmaster'), {
+                    version: version,
+                    downloadUrl: downloadUrl,
+                    changelog: changelog,
+                    updatedAt: new Date().toISOString()
+                });
+
+                status.innerHTML = '<span class="success">✅ Berhasil disimpan!</span>';
+                showToast('Saved!');
+                loadCurrentInfo();
+            } catch (e) {
+                status.innerHTML = '<span class="error">❌ Error: ' + e.message + '</span>';
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Enter key support
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        checkAuth();
+    </script>
+</body>
+
+</html>
