@@ -222,11 +222,56 @@
             border-radius: 8px;
             background: rgba(168, 85, 247, 0.1);
         }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        .login-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .login-error {
+            color: #ff4757;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <div class="login-icon">🔐</div>
+            <h2 style="margin-bottom: 20px;">Admin Login</h2>
+            <input type="password" id="passwordInput" placeholder="Masukkan password" autocomplete="off">
+            <button class="btn-save" style="margin-top: 12px;" onclick="checkPassword()">Login</button>
+            <div id="loginError" class="login-error hidden">Password salah!</div>
+        </div>
+    </div>
+
+    <!-- Main App (hidden until login) -->
+    <div id="mainApp" class="container hidden">
         <h1>🔥 Promo Manager</h1>
         <p class="subtitle">Kelola Flow Ultra Promo</p>
 
@@ -372,8 +417,43 @@
             document.getElementById('preview-info').textContent = `${duration} • ${price}`;
         };
 
-        // Load on start
-        loadPromo();
+        // ======== SHARED AUTHENTICATION ========
+        const ADMIN_PASSWORD = '180201';
+
+        // Check password
+        window.checkPassword = function () {
+            const input = document.getElementById('passwordInput').value;
+            if (input === ADMIN_PASSWORD) {
+                localStorage.setItem('loopmaster_auth', 'true');
+                showApp();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        // Check if already logged in
+        function checkAuth() {
+            if (localStorage.getItem('loopmaster_auth') === 'true') {
+                showApp();
+            }
+        }
+
+        // Show main app
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            loadPromo();
+        }
+
+        // Logout
+        window.logout = function () {
+            localStorage.removeItem('loopmaster_auth');
+            location.reload();
+        }
+
+        // Check auth on load
+        checkAuth();
     </script>
 </body>
 
