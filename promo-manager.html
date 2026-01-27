@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promo Manager - LoopMaster</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <meta name="theme-color" content="#1a1a2e">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #a855f7, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #a855f7;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+        }
+
+        .toggle-label {
+            font-size: 1rem;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle.active {
+            background: #a855f7;
+        }
+
+        .toggle::before {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s;
+        }
+
+        .toggle.active::before {
+            transform: translateX(22px);
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .status.success {
+            display: block;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .status.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status.loading {
+            display: block;
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+        }
+
+        .preview-card {
+            background: linear-gradient(135deg, #ff6b35, #f7c59f);
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #1a1a2e;
+        }
+
+        .preview-badge {
+            font-size: 1.5rem;
+        }
+
+        .preview-content {
+            flex: 1;
+        }
+
+        .preview-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .preview-info {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .preview-wa {
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .nav-link {
+            color: #a855f7;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(168, 85, 247, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔥 Promo Manager</h1>
+        <p class="subtitle">Kelola Flow Ultra Promo</p>
+
+        <!-- Preview -->
+        <div class="card">
+            <label style="margin-bottom: 12px;">Preview Badge</label>
+            <div class="preview-card">
+                <span class="preview-badge">🔥</span>
+                <div class="preview-content">
+                    <div class="preview-title" id="preview-title">Flow Ultra</div>
+                    <div class="preview-info" id="preview-info">30 Hari • Rp 100K</div>
+                </div>
+                <span class="preview-wa">💬</span>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="card">
+            <div class="form-group">
+                <label>Judul Promo</label>
+                <input type="text" id="promo-title" placeholder="Flow Ultra" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+                <label>Durasi</label>
+                <input type="text" id="promo-duration" placeholder="30 Hari" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+                <label>Harga</label>
+                <input type="text" id="promo-price" placeholder="Rp 100K" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+                <label>Nomor WhatsApp (tanpa +)</label>
+                <input type="text" id="promo-wa" placeholder="6287722635389">
+            </div>
+            <div class="form-group">
+                <label>Pesan WhatsApp</label>
+                <textarea id="promo-message" placeholder="Halo, saya ingin beli Flow Ultra..."></textarea>
+            </div>
+            <div class="toggle-group">
+                <span class="toggle-label">Tampilkan Promo</span>
+                <div class="toggle active" id="promo-enabled" onclick="toggleEnabled()"></div>
+            </div>
+        </div>
+
+        <button class="btn-save" id="btn-save" onclick="savePromo()">💾 Simpan ke Firebase</button>
+        <div class="status" id="status"></div>
+
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">📋 License Manager</a>
+            <a href="update-manager.html" class="nav-link">🔄 Update Manager</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBbWWm7pezH9KOUwhFJaeR5VL1RKD6h1cE",
+            authDomain: "loopmaster-license.firebaseapp.com",
+            projectId: "loopmaster-license",
+            storageBucket: "loopmaster-license.firebasestorage.app",
+            messagingSenderId: "962424943920",
+            appId: "1:962424943920:web:503519d66060ac490044f5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Load existing promo config
+        async function loadPromo() {
+            try {
+                const docRef = doc(db, 'app_info', 'promo');
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('promo-title').value = data.title || '';
+                    document.getElementById('promo-duration').value = data.duration || '';
+                    document.getElementById('promo-price').value = data.price || '';
+                    document.getElementById('promo-wa').value = data.waNumber || '';
+                    document.getElementById('promo-message').value = data.waMessage || '';
+
+                    const toggle = document.getElementById('promo-enabled');
+                    if (data.enabled !== false) {
+                        toggle.classList.add('active');
+                    } else {
+                        toggle.classList.remove('active');
+                    }
+
+                    updatePreview();
+                    console.log('Promo config loaded');
+                }
+            } catch (e) {
+                console.error('Failed to load promo:', e);
+            }
+        }
+
+        // Save promo config
+        window.savePromo = async function () {
+            const btn = document.getElementById('btn-save');
+            const status = document.getElementById('status');
+
+            btn.disabled = true;
+            status.className = 'status loading';
+            status.textContent = 'Menyimpan...';
+
+            try {
+                const data = {
+                    title: document.getElementById('promo-title').value || 'Flow Ultra',
+                    duration: document.getElementById('promo-duration').value || '30 Hari',
+                    price: document.getElementById('promo-price').value || 'Rp 100K',
+                    waNumber: document.getElementById('promo-wa').value || '6287722635389',
+                    waMessage: document.getElementById('promo-message').value || 'Halo, saya ingin beli Flow Ultra',
+                    enabled: document.getElementById('promo-enabled').classList.contains('active'),
+                    updatedAt: new Date().toISOString()
+                };
+
+                await setDoc(doc(db, 'app_info', 'promo'), data);
+
+                status.className = 'status success';
+                status.textContent = '✅ Promo berhasil disimpan!';
+            } catch (e) {
+                status.className = 'status error';
+                status.textContent = '❌ Error: ' + e.message;
+            }
+
+            btn.disabled = false;
+            setTimeout(() => { status.className = 'status'; }, 3000);
+        };
+
+        window.toggleEnabled = function () {
+            const toggle = document.getElementById('promo-enabled');
+            toggle.classList.toggle('active');
+        };
+
+        window.updatePreview = function () {
+            const title = document.getElementById('promo-title').value || 'Flow Ultra';
+            const duration = document.getElementById('promo-duration').value || '30 Hari';
+            const price = document.getElementById('promo-price').value || 'Rp 100K';
+
+            document.getElementById('preview-title').textContent = title;
+            document.getElementById('preview-info').textContent = `${duration} • ${price}`;
+        };
+
+        // Load on start
+        loadPromo();
+    </script>
+</body>
+
+</html>
