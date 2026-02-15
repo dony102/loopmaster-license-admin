@@ -274,6 +274,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
         import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
         // Firebase config
         const firebaseConfig = {
@@ -287,24 +288,25 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        const ADMIN_PASSWORD = '180201';
+        // ======== FIREBASE AUTHENTICATION ========
+        const ADMIN_EMAIL = 'admin@loopmaster.pro';
 
         window.checkPassword = function () {
-            const input = document.getElementById('passwordInput').value;
-            if (input === ADMIN_PASSWORD) {
-                localStorage.setItem('loopmaster_auth', 'true');
-                showApp();
-            } else {
-                document.getElementById('loginError').classList.remove('hidden');
-                document.getElementById('passwordInput').value = '';
-            }
-        }
+            const password = document.getElementById('passwordInput').value;
+            const errorEl = document.getElementById('loginError');
+            errorEl.classList.add('hidden');
 
-        function checkAuth() {
-            if (localStorage.getItem('loopmaster_auth') === 'true') {
-                showApp();
-            }
+            signInWithEmailAndPassword(auth, ADMIN_EMAIL, password)
+                .then(() => {
+                    // onAuthStateChanged will handle showing the app
+                })
+                .catch((error) => {
+                    errorEl.textContent = 'Login gagal: ' + (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' ? 'Password salah!' : error.message);
+                    errorEl.classList.remove('hidden');
+                    document.getElementById('passwordInput').value = '';
+                });
         }
 
         function showApp() {
@@ -314,9 +316,14 @@
         }
 
         window.logout = function () {
-            localStorage.removeItem('loopmaster_auth');
-            location.reload();
+            signOut(auth).then(() => location.reload());
         }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                showApp();
+            }
+        });
 
         // Load current update info
         window.loadCurrentInfo = async function () {
@@ -386,8 +393,6 @@
         document.getElementById('passwordInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') checkPassword();
         });
-
-        checkAuth();
     </script>
 </body>
 
